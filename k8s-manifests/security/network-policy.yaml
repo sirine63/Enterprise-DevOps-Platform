@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-to-mysql-only
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: mysql  # Target: The MySQL Database
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend-api # Only allow traffic from the Backend API
+    ports:
+    - protocol: TCP
+      port: 3306

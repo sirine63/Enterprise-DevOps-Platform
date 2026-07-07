@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-app
+  template:
+    metadata:
+      labels:
+        app: frontend-app
+    spec:
+      containers:
+        - name: frontend
+          image: nginx:alpine # We use a high-performance Nginx web server container to host our static frontend
+          ports:
+            - containerPort: 80
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: NodePort # This exposes the port so we can open it directly from your laptop's browser!
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080 # This sets a static port on your local machine
+  selector:
+    app: frontend-app

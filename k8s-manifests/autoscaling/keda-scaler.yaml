@@ -1,0 +1,22 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: springboot-api-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend-api # Targets your Java Spring Boot application
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  cooldownPeriod:  30
+  pollingInterval: 15
+  triggers:
+  - type: prometheus
+    metadata:
+      # Queries the Prometheus engine we configured to track HTTP requests per second
+      serverAddress: http://kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+      metricName: http_requests_total
+      query: sum(rate(http_requests_total[1m]))
+      threshold: '50' # Scales up instantly if traffic exceeds 50 requests/sec
